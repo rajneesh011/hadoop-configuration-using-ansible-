@@ -1,0 +1,3 @@
+---
+- import_playbook: namenode.yml
+- import_playbook: datanode.yml

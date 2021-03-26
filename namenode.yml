@@ -1,0 +1,50 @@
+- hosts: namenode
+  vars_files: NN_vars.yml
+
+  tasks: 
+    - name: 'Uploading Hadoop Software'
+      copy:
+        src: "{{ hadoop_software }}"
+        dest: "{{ software_dest }}"
+
+    - name: 'Uploading JDK Software'
+      copy:
+        src: "{{ jdk_software }}"
+        dest: "{{ software_dest }}"
+
+    - name: 'Installation of JDK initializing...'
+      shell: rpm -ivh "{{ jdk_software }}"
+      when: false
+ 
+    - name: 'Installation of Hadoop initializing...'
+      shell: rpm -ivh "{{ hadoop_software }}" --force
+      when: false
+  
+    - name: 'Creating directory for Namenode...'
+      file:
+        state: directory
+        path: "{{ namenode_folder }}"
+
+    - name: 'Copying core-file...'
+      template:
+        src: "{{ core_site_src }}"
+        dest: "{{ core_site_dest }}"
+
+    - name: 'Copying hdfs file...'
+      template:
+        src: "{{ hdfs_src }}"
+        dest: "{{ hdfs_dest }}"
+
+    - name: "Formatting the Directory..."
+      shell: "echo Y | hadoop namenode -format"
+      when: false 
+
+    - name: "Initializing namenode"
+      shell: "hadoop-daemon.sh start namenode" 
+
+    - name: "Final Outcome"
+      shell: "jps"
+      register: outcome
+
+    - debug:
+        var: outcome
